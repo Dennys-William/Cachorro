@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cachorros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #3d4852;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #5661b3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background-color: #4c51bf;
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(86, 97, 179, 0.5);
+        }
+
+        #status {
+            margin: 1rem 0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background-color: #e3e8ee;
+            color: #606f7b;
+            transition: all 0.3s ease;
+        }
+
+        #cachorro {
+            width: 100%;
+            max-width: 500px;
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.5s ease;
+        }
+
+        img:hover {
+            transform: scale(1.03);
+        }
+
+        .status-loading {
+            background-color: #fffde7;
+            color: #b7791f;
+        }
+
+        .status-success {
+            background-color: #e3fcec;
+            color: #38a169;
+        }
+
+        .status-error {
+            background-color: #fef2f2;
+            color: #e53e3e;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            #cachorro {
+                min-height: 200px;
+            }
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #8795a1;
+            font-size: 0.8rem;
+        }
+
+        .paw-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="paw-icon">🐾</span>Veja um Cachorro!</h1>
+        <button id="botao-cachorro">Carregar Nova Imagem</button>
+        <div id="status" role="status" aria-live="polite">Pronto para carregar uma imagem</div>
+        <div id="cachorro" role="region" aria-label="Imagem de cachorro"></div>
+    </div>
+    <footer>
+        Imagens fornecidas por <a href="https://dog.ceo/dog-api/" target="_blank">Dog API</a>
+    </footer>
+
+    <script>
+    let primeiroClique = true;
+    async function buscarCachorro() {
+       
+        if (primeiroClique) {
+            document.getElementById('botao-cachorro').textContent = 'Fazer mais uma imagem';
+            primeiroClique = false;
+        }
+        
+       
+        const status = document.getElementById('status');
+        status.textContent = 'Carregando imagem...';
+        status.className = 'status-loading';
+        
+        try {
+            const resposta = await fetch('https://dog.ceo/api/breeds/image/random');
+            if (!resposta.ok) {
+                throw new Error('Erro ao buscar a imagem');
+            }
+            const dados = await resposta.json();
+            const cachorroDiv = document.getElementById('cachorro');
+            cachorroDiv.innerHTML = `<img src="${dados.message}" alt="Imagem aleatória de um cachorro" />`;
+            status.textContent = 'Imagem carregada com sucesso!';
+            status.className = 'status-success';
+        } catch (erro) {
+            console.error('Erro:', erro);
+            status.textContent = 'Falha ao carregar a imagem. Tente novamente.';
+            status.className = 'status-error';
+            document.getElementById('cachorro').innerHTML = '';
+        }
+    }
+
+ 
+    const botao = document.getElementById('botao-cachorro');
+    botao.addEventListener('click', buscarCachorro);
+    botao.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Enter' || evento.key === ' ') {
+            buscarCachorro();
+        }
+    });
+    </script>
+</body>
+</html>
